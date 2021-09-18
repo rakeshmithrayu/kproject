@@ -1,37 +1,44 @@
---- 
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
-  labels: 
-    app: mongodb
+metadata:
   name: mondodb-deployment
-spec: 
+  labels:
+    app: mongodb
+spec:
   replicas: 1
-  selector: 
-    matchLabels: 
+  selector:
+    matchLabels:
       app: mongodb
-  template: 
-    metadata: 
-      labels: 
+  template:
+    metadata:
+      labels:
         app: mongodb
-    spec: 
-      containers: 
-        - 
-          env: 
-            - 
-              name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom: 
-                secretKeyRef: 
-                  key: mongo-root-username
-                  name: mongodb-secret
-            - 
-              name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom: 
-                secretKeyRef: 
-                  key: mongo-root-passowrd
-                  name: mongodb-secret
-          image: mongo
-          name: mongodb
-          ports: 
-            - 
-              containerPort: 27017
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+           valueFrom:
+             secretKeyRef:
+               name: mongodb-secret #fromsecretdb.yml secret metadata name
+               key: mongo-root-username    #from secretdb.yaml         
+        - name: MONGO_INITDB_ROOT_PASSWORD
+           valueFrom:
+             secretKeyRef:
+               name: mongodb-secret
+               key: mongo-root-passowrd
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:  #to connect to the pod through lable
+    app: mongodb
+  ports:
+  - port: 27017   #service port
+    targetPort: 27017 #container port
