@@ -1,52 +1,43 @@
+--- 
 apiVersion: apps/v1
 kind: Deployment
-metadata:
-  name: mongo-express
-  labels:
+metadata: 
+  labels: 
     app: mongo-express
-spec:
- replicas: 1
-  selector:
-    matchLabels:
+  name: mongo-express
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels: 
       app: mongo-express
- template:
-  metadata:
-    labels:
-      app: mongo-express
-    spec:
-      containers:
-      - name: mongo-application
-        image: mongo-express
-        ports:
-        - containerPort: 8081
-        env:
-        - name: ME_CONFIG_MONGODB_ADMINUSERNAME 
-           valueFrom:
-             secretKeyRef:
-               name: mongodb-secret #fromsecretdb.yml secret metadata name
-               key: mongo-root-username    #from secretdb.yaml         
-        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
-           valueFrom:
-              secretKeyRef:
-               name: mongodb-secret #fromsecretdb.yml secret metadata name
-               key: mongo-root-password    #from secretdb.yaml        
-        - name: ME_CONFIG_MONGODB_SERVER        
-           valueFrom:
-              ConfigMapKeyRef:
-                name: mongodb-configmap #fromsecretdb.yml secret metadata name
-                key: database_url    #from secretdb.yaml     
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongo-express-external
-spec:
-  selector:
-    app: myapmongo-express
-  type: LoadBalacer
-  ports:
-  - port: 8081
-    targetPort: 8081
-    nodeport: 30000              #port open on browser range 30000-32767
-
+  template: 
+    metadata: 
+      labels: 
+        app: mongo-express
+      spec: 
+        containers: 
+          - 
+            env: 
+              - 
+                name: ME_CONFIG_MONGODB_ADMINUSERNAME
+                valueFrom: 
+                  secretKeyRef: 
+                    key: mongo-root-username
+                    name: mongodb-secret
+              - 
+                name: ME_CONFIG_MONGODB_ADMINPASSWORD
+                valueFrom: 
+                  secretKeyRef: 
+                    key: mongo-root-password
+                    name: mongodb-secret
+              - 
+                name: ME_CONFIG_MONGODB_SERVER
+                valueFrom: 
+                  ConfigMapKeyRef: 
+                    key: database_url
+                    name: mongodb-configmap
+            image: mongo-express
+            name: mongo-application
+            ports: 
+              - 
+                containerPort: 8081
